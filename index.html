@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Copa 2026 - Família</title>
+    <style>
+        :root {
+            --green: #27ae60;
+            --red: #c0392b;
+            --dark: #2c3e50;
+            --section-bg: #ffffff;
+            --country-bg: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e9ecef;
+            margin: 0;
+            padding: 0;
+            color: var(--dark);
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            background: white;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Título Principal Centralizado */
+        .main-title {
+            width: 100%;
+            text-align: center;
+            margin: 0 0 15px 0;
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--dark);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Container de Filtros Ajustado */
+        .filters-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        select {
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            font-size: 14px;
+            width: 100%;
+            background: white;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .container {
+            padding: 15px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* Painel de Estatísticas Geral */
+        .stats-panel {
+            background: var(--dark);
+            color: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            opacity: 0.8;
+        }
+
+        /* Seções e Países */
+        .section-container {
+            background: var(--section-bg);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .section-title {
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            font-size: 1.3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .counter-badge {
+            background: #fff;
+            border: 2px solid var(--dark);
+            padding: 2px 10px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        .country-container {
+            background: var(--country-bg);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 5px solid var(--dark);
+        }
+
+        .country-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .country-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .flag-icon {
+            width: 35px;
+            height: 25px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+
+        .country-name {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .sticker-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(65px, 1fr));
+            gap: 8px;
+        }
+
+        .sticker {
+            aspect-ratio: 1 / 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.8rem;
+            color: white;
+            transition: transform 0.1s;
+        }
+
+        .sticker:active { transform: scale(0.9); }
+        .missing { background-color: var(--red); }
+        .owned { background-color: var(--green); }
+
+        /* Responsividade para Filtros */
+        @media (min-width: 600px) {
+            .filters-container { grid-template-columns: repeat(3, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1 class="main-title">ÁLBUM COPA DO MUNDO 2026 FAMÍLIA</h1>
+    <div class="filters-container">
+        <select id="sessionFilter">
+            <option value="all">Todas as Sessões</option>
+            <option value="history">FIFA World Cup History</option>
+            <option value="coca">Coca-Cola</option>
+        </select>
+        <select id="countryFilter"><option value="all">Todos os Países</option></select>
+        <select id="statusFilter">
+            <option value="all">Todas as Figurinhas</option>
+            <option value="missing">Faltantes</option>
+            <option value="owned">Adquiridas</option>
+        </select>
+    </div>
+</header>
+
+<div class="container">
+    <div class="stats-panel" id="globalStats">
+        <div class="stat-item">
+            <span class="stat-value" id="totalOwned">0</span>
+            <span class="stat-label">Adquiridas</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-value" id="totalMissing">0</span>
+            <span class="stat-label">Faltantes</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-value" id="totalPercent">0%</span>
+            <span class="stat-label">Concluído</span>
+        </div>
+    </div>
+
+    <div id="mainContent"></div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAb7hlSZIFCk3oyDPwTXJOLWXyXviVtNtw",
+        authDomain: "figurinhascopa2026-7b58d.firebaseapp.com",
+        databaseURL: "https://figurinhascopa2026-7b58d-default-rtdb.firebaseio.com",
+        projectId: "figurinhascopa2026-7b58d",
+        storageBucket: "figurinhascopa2026-7b58d.firebasestorage.app",
+        messagingSenderId: "696721115753",
+        appId: "1:696721115753:web:5250dce4fe55b2c52870f8",
+        measurementId: "G-2SDTPQXG33"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const albumRef = ref(db, 'colecao_familia/');
+
+    const groupMap = [
+        { name: "Grupo A", teams: [{n:"MÉXICO", s:"MEX", c:"mx"}, {n:"ÁFRICA DO SUL", s:"RSA", c:"za"}, {n:"CORÉIA DO SUL", s:"KOR", c:"kr"}, {n:"REP. TCHECA", s:"CZE", c:"cz"}] },
+        { name: "Grupo B", teams: [{n:"CANADA", s:"CAN", c:"ca"}, {n:"BOSNIA", s:"BIH", c:"ba"}, {n:"CATAR", s:"QAT", c:"qa"}, {n:"SUIÇA", s:"SUI", c:"ch"}] },
+        { name: "Grupo C", teams: [{n:"BRASIL", s:"BRA", c:"br"}, {n:"MARROCOS", s:"MAR", c:"ma"}, {n:"HAITI", s:"HAI", c:"ht"}, {n:"ESCÓCIA", s:"SCO", c:"gb-sct"}] },
+        { name: "Grupo D", teams: [{n:"ESTADOS UNIDOS", s:"USA", c:"us"}, {n:"PARAGUAI", s:"PAR", c:"py"}, {n:"AUSTRALIA", s:"AUS", c:"au"}, {n:"TURQUIA", s:"TUR", c:"tr"}] },
+        { name: "Grupo E", teams: [{n:"ALEMANHA", s:"GER", c:"de"}, {n:"CURAÇAO", s:"CUW", c:"cw"}, {n:"COSTA DO MARFIM", s:"CIV", c:"ci"}, {n:"EQUADOR", s:"ECU", c:"ec"}] },
+        { name: "Grupo F", teams: [{n:"HOLANDA", s:"NED", c:"nl"}, {n:"JAPÃO", s:"JPN", c:"jp"}, {n:"SUECIA", s:"SWE", c:"se"}, {n:"TUNISIA", s:"TUN", c:"tn"}] },
+        { name: "Grupo G", teams: [{n:"BÉLGICA", s:"BEL", c:"be"}, {n:"EGITO", s:"EGY", c:"eg"}, {n:"IRA", s:"IRN", c:"ir"}, {n:"NOVA ZELANDIA", s:"NZL", c:"nz"}] },
+        { name: "Grupo H", teams: [{n:"ESPANHA", s:"ESP", c:"es"}, {n:"CABO VERDE", s:"CPV", c:"cv"}, {n:"ARABIA SAUDITA", s:"KSA", c:"sa"}, {n:"URUGUAI", s:"URU", c:"uy"}] },
+        { name: "Grupo I", teams: [{n:"FRANÇA", s:"FRA", c:"fr"}, {n:"SENEGAL", s:"SEN", c:"sn"}, {n:"IRAQUE", s:"IRQ", c:"iq"}, {n:"NORUEGA", s:"NOR", c:"no"}] },
+        { name: "Grupo J", teams: [{n:"ARGENTINA", s:"ARG", c:"ar"}, {n:"ARGÉLIA", s:"ALG", c:"dz"}, {n:"AUSTRIA", s:"AUT", c:"at"}, {n:"JORDANIA", s:"JOR", c:"jo"}] },
+        { name: "Grupo K", teams: [{n:"PORTUGAL", s:"POR", c:"pt"}, {n:"CONGO", s:"COD", c:"cd"}, {n:"UZBEQUISTÃO", s:"UZB", c:"uz"}, {n:"COLOMBIA", s:"COL", c:"co"}] },
+        { name: "Grupo L", teams: [{n:"INGLATERRA", s:"ENG", c:"gb-eng"}, {n:"CROACIA", s:"CRO", c:"hr"}, {n:"GANA", s:"GHA", c:"gh"}, {n:"PANAMA", s:"PAN", c:"pa"}] }
+    ];
+
+    const globalStickerIds = [];
+    for(let i=0; i<=19; i++) globalStickerIds.push(i <= 8 ? `FWC-${i}` : `HIST-${i}`);
+    groupMap.forEach(g => g.teams.forEach(t => { for(let i=1; i<=20; i++) globalStickerIds.push(`${t.s}-${i}`); }));
+    for(let i=1; i<=14; i++) globalStickerIds.push(`CC-${i}`);
+
+    const sessionFilter = document.getElementById('sessionFilter');
+    const countrySelect = document.getElementById('countryFilter');
+    groupMap.forEach(g => {
+        const opt = document.createElement('option'); opt.value = g.name; opt.textContent = g.name;
+        sessionFilter.insertBefore(opt, sessionFilter.lastElementChild);
+        g.teams.forEach(t => {
+            const co = document.createElement('option'); co.value = t.s; co.textContent = t.n;
+            countrySelect.appendChild(co);
+        });
+    });
+
+    let dbState = {};
+    onValue(albumRef, (snapshot) => { dbState = snapshot.val() || {}; updateGlobalStats(); render(); });
+
+    window.toggleSticker = (id) => {
+        const cur = dbState[id] || 'missing';
+        set(ref(db, 'colecao_familia/' + id), cur === 'missing' ? 'owned' : 'missing');
+    };
+
+    function updateGlobalStats() {
+        const owned = globalStickerIds.filter(id => dbState[id] === 'owned').length;
+        const total = globalStickerIds.length;
+        const missing = total - owned;
+        const percent = ((owned / total) * 100).toFixed(1);
+
+        document.getElementById('totalOwned').textContent = owned;
+        document.getElementById('totalMissing').textContent = missing;
+        document.getElementById('totalPercent').textContent = `${percent}%`;
+    }
+
+    function render() {
+        const main = document.getElementById('mainContent');
+        const sF = document.getElementById('sessionFilter').value;
+        const cF = document.getElementById('countryFilter').value;
+        const stF = document.getElementById('statusFilter').value;
+        main.innerHTML = '';
+
+        if (sF === 'all' || sF === 'history') {
+            const ids = Array.from({length:20}, (_,i) => i<=8 ? `FWC-${i}` : `HIST-${i}`);
+            const acq = ids.filter(id => dbState[id] === 'owned').length;
+            const sec = createSection("FIFA World Cup History", acq, 20);
+            ids.forEach(id => {
+                const el = createStickerEl(id, id.split('-')[1].padStart(2,'0'), stF);
+                if(el) sec.querySelector('.sticker-grid').appendChild(el);
+            });
+            if(sec.querySelector('.sticker-grid').children.length > 0) main.appendChild(sec);
+        }
+
+        groupMap.forEach(group => {
+            if (sF === 'all' || sF === group.name) {
+                let gAcq = 0;
+                group.teams.forEach(t => { for(let i=1;i<=20;i++) if(dbState[`${t.s}-${i}`]==='owned') gAcq++; });
+                const sec = createSection(group.name, gAcq, group.teams.length * 20);
+                sec.querySelector('.sticker-grid').remove();
+
+                group.teams.forEach(team => {
+                    if (cF !== 'all' && team.s !== cF) return;
+                    let tAcq = 0;
+                    for(let i=1;i<=20;i++) if(dbState[`${team.s}-${i}`]==='owned') tAcq++;
+
+                    const cDiv = document.createElement('div');
+                    cDiv.className = 'country-container';
+                    cDiv.innerHTML = `
+                        <div class="country-header">
+                            <div class="country-info">
+                                <img class="flag-icon" src="https://flagcdn.com/w40/${team.c}.png" alt="Bandeira">
+                                <h4 class="country-name">${team.n} (${team.s})</h4>
+                            </div>
+                            <span class="counter-badge">${tAcq}/20</span>
+                        </div>
+                        <div class="sticker-grid"></div>`;
+                    
+                    for(let i=1;i<=20;i++) {
+                        const el = createStickerEl(`${team.s}-${i}`, `${team.s}${i}`, stF);
+                        if(el) cDiv.querySelector('.sticker-grid').appendChild(el);
+                    }
+                    if(cDiv.querySelector('.sticker-grid').children.length > 0) sec.appendChild(cDiv);
+                });
+                if(sec.children.length > 1) main.appendChild(sec);
+            }
+        });
+
+        if (sF === 'all' || sF === 'coca') {
+            let acq = 0;
+            for(let i=1;i<=14;i++) if(dbState[`CC-${i}`]==='owned') acq++;
+            const sec = createSection("Coca-Cola", acq, 14);
+            for(let i=1;i<=14;i++) {
+                const el = createStickerEl(`CC-${i}`, `CC${i}`, stF);
+                if(el) sec.querySelector('.sticker-grid').appendChild(el);
+            }
+            if(sec.querySelector('.sticker-grid').children.length > 0) main.appendChild(sec);
+        }
+    }
+
+    function createSection(t, a, tot) {
+        const d = document.createElement('div'); d.className = 'section-container';
+        d.innerHTML = `<div class="section-title"><span>${t}</span><span class="counter-badge">${a}/${tot}</span></div><div class="sticker-grid"></div>`;
+        return d;
+    }
+
+    function createStickerEl(id, label, stF) {
+        const s = dbState[id] || 'missing';
+        if (stF !== 'all' && s !== stF) return null;
+        const e = document.createElement('div'); e.className = `sticker ${s}`; e.textContent = label;
+        e.onclick = () => toggleSticker(id);
+        return e;
+    }
+
+    document.querySelectorAll('select').forEach(s => s.onchange = render);
+</script>
+</body>
+</html>
