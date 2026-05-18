@@ -183,7 +183,6 @@
 
         .sticker-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(75px, 1fr)); gap: 10px; }
 
-        /* Estrutura da Figurinha com os Contadores */
         .sticker {
             aspect-ratio: 1 / 1.2;
             display: flex;
@@ -207,7 +206,6 @@
             text-shadow: 0 1px 2px rgba(0,0,0,0.4);
         }
 
-        /* Badge Indicadora de Quantidade Repetida */
         .repeat-badge {
             position: absolute;
             top: 4px; right: 4px;
@@ -220,7 +218,6 @@
             border: 1px solid rgba(255,255,255,0.3);
         }
 
-        /* Mini Botões de Controle de Repetidas */
         .repeat-controls {
             display: flex;
             height: 24px;
@@ -241,10 +238,17 @@
             justify-content: center;
             transition: background 0.1s;
         }
-        .btn-repeat:active { background: rgba(255,255,255,0.2); }
+        .btn-repeat:active:not(:disabled) { background: rgba(255,255,255,0.2); }
         .btn-minus { border-right: 1px solid rgba(255,255,255,0.15); }
 
-        /* Definição de Cores das Figurinhas */
+        /* Estado desabilitado (bloqueado para figurinhas faltantes) */
+        .btn-repeat:disabled {
+            color: rgba(255, 255, 255, 0.3) !important;
+            cursor: not-allowed;
+            background: rgba(0, 0, 0, 0.1) !important;
+        }
+
+        /* Cores das Figurinhas */
         .missing { background-color: var(--red); }
         .owned { background-color: var(--green); }
         .gu { background-color: var(--blue); }
@@ -252,6 +256,7 @@
         .album { background-color: var(--gold); color: #222; text-shadow: none; }
         .album .repeat-controls { background: rgba(0,0,0,0.08); border-top: 1px solid rgba(0,0,0,0.1); }
         .album .btn-repeat { color: #222; }
+        .album .btn-repeat:disabled { color: rgba(0, 0, 0, 0.2) !important; }
         .album .btn-minus { border-right: 1px solid rgba(0,0,0,0.08); }
 
         /* Estilos do Modal */
@@ -402,11 +407,10 @@
     let dbState = {};
     onValue(albumRef, (snapshot) => { dbState = snapshot.val() || {}; updateGlobalStats(); render(); });
 
-    // INTERAÇÃO COM O BANCO (ESTADOS E REPETIDAS)
     window.toggleSticker = (id) => {
         const data = dbState[id] || { status: 'missing', qty: 0 };
         const curStatus = (typeof data === 'string') ? data : (data.status || 'missing');
-        const curQty = data.qty || 0;
+        let curQty = data.qty || 0;
 
         let nextStatus = 'missing';
         if (curStatus === 'missing') nextStatus = 'owned';
@@ -415,6 +419,9 @@
         else if (curStatus === 'cath') nextStatus = 'album';
         else if (curStatus === 'album') nextStatus = 'missing';
 
+        // Regra extra de segurança: Se voltou a faltar, limpa a quantidade de repetidas para 0
+        if (nextStatus === 'missing') curQty = 0;
+
         set(ref(db, 'colecao_familia/' + id), { status: nextStatus, qty: curQty });
     };
 
@@ -422,6 +429,9 @@
         const data = dbState[id] || { status: 'missing', qty: 0 };
         const curStatus = (typeof data === 'string') ? data : (data.status || 'missing');
         let curQty = data.qty || 0;
+
+        // Proteção extra via JS: Não faz nada se a figurinha estiver faltando
+        if (curStatus === 'missing') return;
 
         curQty += change;
         if (curQty < 0) curQty = 0;
@@ -432,7 +442,7 @@
     function getStickerData(id) {
         const raw = dbState[id];
         if (!raw) return { status: 'missing', qty: 0 };
-        if (typeof raw === 'string') return { status: raw, qty: 0 }; // Legado
+        if (typeof raw === 'string') return { status: raw, qty: 0 };
         return { status: raw.status || 'missing', qty: raw.qty || 0 };
     }
 
@@ -451,7 +461,6 @@
         document.getElementById('totalPercent').textContent = `${percent}%`;
     }
 
-    // GERAÇÃO DE TEXTO PARA WHATSAPP (FALTANTES + REPETIDAS)
     window.openMissingModal = function() {
         const modal = document.getElementById('missingModal');
         const container = document.getElementById('textListContainer');
@@ -583,10 +592,10 @@
 
     function createStickerNode(id, label, stF) {
         const info = getStickerData(id);
+        const isMissing = !isAcquired(info.status);
         
-        // Regras adicionais de filtragem
         if (stF !== 'all') {
-            if (stF === 'missing' && isAcquired(info.status)) return null;
+            if (stF === 'missing' && !isMissing) return null;
             if (stF === 'repeats' && info.qty === 0) return null;
             if (stF !== 'missing' && stF !== 'repeats' && info.status !== stF) return null;
         }
@@ -594,15 +603,15 @@
         const e = document.createElement('div'); 
         e.className = `sticker ${info.status}`;
         
-        // Elemento interno indicador de repetidas
         let badgeHtml = info.qty > 0 ? `<div class="repeat-badge">${info.qty}x</div>` : '';
 
+        // O atributo 'disabled' é adicionado condicionalmente se a figurinha for faltante (isMissing)
         e.innerHTML = `
             ${badgeHtml}
             <div class="sticker-body" onclick="toggleSticker('${id}')">${label}</div>
             <div class="repeat-controls">
-                <button class="btn-repeat btn-minus" onclick="changeQty('${id}', -1)">-</button>
-                <button class="btn-repeat btn-plus" onclick="changeQty('${id}', 1)">+</button>
+                <button class="btn-repeat btn-minus" ${isMissing ? 'disabled' : ''} onclick="changeQty('${id}', -1)">-</button>
+                <button class="btn-repeat btn-plus" ${isMissing ? 'disabled' : ''} onclick="changeQty('${id}', 1)">+</button>
             </div>
         `;
         return e;
