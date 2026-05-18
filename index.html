@@ -98,7 +98,6 @@
             margin: 0 auto;
         }
 
-        /* Painel de Legenda e Estatísticas Geral */
         .stats-panel {
             background: var(--dark);
             color: white;
@@ -121,7 +120,6 @@
         .stat-value { font-size: 1.5rem; font-weight: bold; }
         .stat-label { font-size: 0.8rem; text-transform: uppercase; opacity: 0.8; }
 
-        /* Nova Legenda de Cores */
         .legend-row {
             display: flex;
             justify-content: center;
@@ -183,30 +181,78 @@
         .flag-icon { width: 35px; height: 25px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd; }
         .country-name { margin: 0; font-size: 1.1rem; font-weight: bold; text-transform: uppercase; }
 
-        .sticker-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(65px, 1fr)); gap: 8px; }
+        .sticker-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(75px, 1fr)); gap: 10px; }
 
+        /* Estrutura da Figurinha com os Contadores */
         .sticker {
-            aspect-ratio: 1 / 1;
+            aspect-ratio: 1 / 1.2;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            user-select: none;
+            color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .sticker-body {
+            flex-grow: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 6px;
-            cursor: pointer;
             font-weight: bold;
-            font-size: 0.8rem;
-            color: white;
-            transition: transform 0.1s;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            font-size: 0.85rem;
+            cursor: pointer;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.4);
         }
 
-        .sticker:active { transform: scale(0.9); }
-        
+        /* Badge Indicadora de Quantidade Repetida */
+        .repeat-badge {
+            position: absolute;
+            top: 4px; right: 4px;
+            background: rgba(0, 0, 0, 0.75);
+            color: #fff;
+            font-size: 0.65rem;
+            padding: 2px 5px;
+            border-radius: 10px;
+            font-weight: bold;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        /* Mini Botões de Controle de Repetidas */
+        .repeat-controls {
+            display: flex;
+            height: 24px;
+            background: rgba(0,0,0,0.15);
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .btn-repeat {
+            flex: 1;
+            border: none;
+            background: transparent;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.1s;
+        }
+        .btn-repeat:active { background: rgba(255,255,255,0.2); }
+        .btn-minus { border-right: 1px solid rgba(255,255,255,0.15); }
+
         /* Definição de Cores das Figurinhas */
         .missing { background-color: var(--red); }
         .owned { background-color: var(--green); }
         .gu { background-color: var(--blue); }
         .cath { background-color: var(--orange); }
         .album { background-color: var(--gold); color: #222; text-shadow: none; }
+        .album .repeat-controls { background: rgba(0,0,0,0.08); border-top: 1px solid rgba(0,0,0,0.1); }
+        .album .btn-repeat { color: #222; }
+        .album .btn-minus { border-right: 1px solid rgba(0,0,0,0.08); }
 
         /* Estilos do Modal */
         .modal {
@@ -220,7 +266,7 @@
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #222d34; padding-bottom: 10px; }
         .modal-header h2 { margin: 0; font-size: 1.2rem; }
         .btn-close { background: transparent; border: none; color: #8696a0; font-size: 24px; cursor: pointer; }
-        .txt-area-list { background: #202c33; color: #e9edef; border: 1px solid #2a3942; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 15px; line-height: 1.5; overflow-y: auto; flex-grow: 1; white-space: pre-wrap; user-select: all; }
+        .txt-area-list { background: #202c33; color: #e9edef; border: 1px solid #2a3942; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 14px; line-height: 1.5; overflow-y: auto; flex-grow: 1; white-space: pre-wrap; user-select: all; }
         .modal-footer { margin-top: 15px; display: flex; gap: 10px; }
         .btn-copy { background-color: #00a884; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; flex-grow: 1; font-size: 14px; }
         .btn-copy:active { background-color: #008069; }
@@ -251,9 +297,10 @@
                 <option value="gu">Adquiridas: Gu</option>
                 <option value="cath">Adquiridas: Cath</option>
                 <option value="album">Coladas no Álbum</option>
+                <option value="repeats">Somente Repetidas</option>
             </select>
         </div>
-        <button class="btn-generate" onclick="openMissingModal()">📋 Lista de Faltantes</button>
+        <button class="btn-generate" onclick="openMissingModal()">📋 Lista WhatsApp</button>
     </div>
 </header>
 
@@ -288,7 +335,7 @@
 <div id="missingModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <h2>Figurinhas que Faltam</h2>
+            <h2>Lista para Compartilhar</h2>
             <button class="btn-close" onclick="closeMissingModal()">&times;</button>
         </div>
         <div id="textListContainer" class="txt-area-list">Gerando lista...</div>
@@ -355,27 +402,46 @@
     let dbState = {};
     onValue(albumRef, (snapshot) => { dbState = snapshot.val() || {}; updateGlobalStats(); render(); });
 
-    // CICLO DE CLIQUES DOS STATUS 
+    // INTERAÇÃO COM O BANCO (ESTADOS E REPETIDAS)
     window.toggleSticker = (id) => {
-        const cur = dbState[id] || 'missing';
+        const data = dbState[id] || { status: 'missing', qty: 0 };
+        const curStatus = (typeof data === 'string') ? data : (data.status || 'missing');
+        const curQty = data.qty || 0;
+
         let nextStatus = 'missing';
+        if (curStatus === 'missing') nextStatus = 'owned';
+        else if (curStatus === 'owned') nextStatus = 'gu';
+        else if (curStatus === 'gu') nextStatus = 'cath';
+        else if (curStatus === 'cath') nextStatus = 'album';
+        else if (curStatus === 'album') nextStatus = 'missing';
 
-        if (cur === 'missing') nextStatus = 'owned';    // 1º Clique: Verde (Ijuí)
-        else if (cur === 'owned') nextStatus = 'gu';     // 2º Clique: Azul (Gu)
-        else if (cur === 'gu') nextStatus = 'cath';     // 3º Clique: Laranja (Cath)
-        else if (cur === 'cath') nextStatus = 'album';  // 4º Clique: Dourado (Álbum)
-        else if (cur === 'album') nextStatus = 'missing';// 5º Clique: Volta ao Vermelho
-
-        set(ref(db, 'colecao_familia/' + id), nextStatus);
+        set(ref(db, 'colecao_familia/' + id), { status: nextStatus, qty: curQty });
     };
 
-    // Helper para checar se a figurinha foi adquirida (qualquer um dos status válidos)
+    window.changeQty = (id, change) => {
+        const data = dbState[id] || { status: 'missing', qty: 0 };
+        const curStatus = (typeof data === 'string') ? data : (data.status || 'missing');
+        let curQty = data.qty || 0;
+
+        curQty += change;
+        if (curQty < 0) curQty = 0;
+
+        set(ref(db, 'colecao_familia/' + id), { status: curStatus, qty: curQty });
+    };
+
+    function getStickerData(id) {
+        const raw = dbState[id];
+        if (!raw) return { status: 'missing', qty: 0 };
+        if (typeof raw === 'string') return { status: raw, qty: 0 }; // Legado
+        return { status: raw.status || 'missing', qty: raw.qty || 0 };
+    }
+
     function isAcquired(status) {
         return ['owned', 'gu', 'cath', 'album'].includes(status);
     }
 
     function updateGlobalStats() {
-        const owned = globalStickerIds.filter(id => isAcquired(dbState[id])).length;
+        const owned = globalStickerIds.filter(id => isAcquired(getStickerData(id).status)).length;
         const total = globalStickerIds.length;
         const missing = total - owned;
         const percent = ((owned / total) * 100).toFixed(1);
@@ -385,36 +451,52 @@
         document.getElementById('totalPercent').textContent = `${percent}%`;
     }
 
+    // GERAÇÃO DE TEXTO PARA WHATSAPP (FALTANTES + REPETIDAS)
     window.openMissingModal = function() {
         const modal = document.getElementById('missingModal');
         const container = document.getElementById('textListContainer');
         modal.style.display = 'flex';
-        let outputText = "";
-
+        
+        let txtMissing = "❌ *FALTANTES:*\n";
+        let txtRepeats = "\n🔁 *REPETIDAS:*\n";
+        
         let missingFWC = [];
+        let repeatsFWC = [];
         for(let i=0; i<=19; i++) {
             const id = i <= 8 ? `FWC-${i}` : `HIST-${i}`;
-            if(!isAcquired(dbState[id])) missingFWC.push(i);
+            const info = getStickerData(id);
+            if(!isAcquired(info.status)) missingFWC.push(i);
+            if(info.qty > 0) repeatsFWC.push(`${i}(${info.qty}x)`);
         }
-        if(missingFWC.length > 0) outputText += `FWC 🌍 : ${missingFWC.join(', ')}\n`;
+        if(missingFWC.length > 0) txtMissing += `FWC 🌍 : ${missingFWC.join(', ')}\n`;
+        if(repeatsFWC.length > 0) txtRepeats += `FWC 🌍 : ${repeatsFWC.join(', ')}\n`;
 
         groupMap.forEach(group => {
             group.teams.forEach(team => {
                 let missingNumbers = [];
+                let repeatNumbers = [];
                 for(let i=1; i<=20; i++) {
-                    if(!isAcquired(dbState[`${team.s}-${i}`])) missingNumbers.push(i);
+                    const info = getStickerData(`${team.s}-${i}`);
+                    if(!isAcquired(info.status)) missingNumbers.push(i);
+                    if(info.qty > 0) repeatNumbers.push(`${i}(${info.qty}x)`);
                 }
-                if(missingNumbers.length > 0) outputText += `${team.s} ${team.e} : ${missingNumbers.join(', ')}\n`;
+                if(missingNumbers.length > 0) txtMissing += `${team.s} ${team.e} : ${missingNumbers.join(', ')}\n`;
+                if(repeatNumbers.length > 0) txtRepeats += `${team.s} ${team.e} : ${repeatNumbers.join(', ')}\n`;
             });
         });
 
         let missingCoca = [];
+        let repeatsCoca = [];
         for(let i=1; i<=14; i++) {
-            if(!isAcquired(dbState[`CC-${i}`])) missingCoca.push(i);
+            const info = getStickerData(`CC-${i}`);
+            if(!isAcquired(info.status)) missingCoca.push(i);
+            if(info.qty > 0) repeatsCoca.push(`CC${i}(${info.qty}x)`);
         }
-        if(missingCoca.length > 0) outputText += `COCA-COLA 🥤 : ${missingCoca.join(', ')}\n`;
+        if(missingCoca.length > 0) txtMissing += `COCA-COLA 🥤 : ${missingCoca.join(', ')}\n`;
+        if(repeatsCoca.length > 0) txtRepeats += `COCA-COLA 🥤 : ${repeatsCoca.join(', ')}\n`;
 
-        container.textContent = outputText || "🎉 Parabéns! O álbum está completo!";
+        if (txtRepeats === "\n🔁 *REPETIDAS:*\n") txtRepeats = "";
+        container.textContent = txtMissing + txtRepeats;
     };
 
     window.closeMissingModal = function() { document.getElementById('missingModal').style.display = 'none'; };
@@ -438,10 +520,10 @@
 
         if (sF === 'all' || sF === 'history') {
             const ids = Array.from({length:20}, (_,i) => i<=8 ? `FWC-${i}` : `HIST-${i}`);
-            const acq = ids.filter(id => isAcquired(dbState[id])).length;
+            const acq = ids.filter(id => isAcquired(getStickerData(id).status)).length;
             const sec = createSection("FIFA World Cup History", acq, 20);
             ids.forEach(id => {
-                const el = createStickerEl(id, id.split('-')[1].padStart(2,'0'), stF);
+                const el = createStickerNode(id, id.split('-')[1].padStart(2,'0'), stF);
                 if(el) sec.querySelector('.sticker-grid').appendChild(el);
             });
             if(sec.querySelector('.sticker-grid').children.length > 0) main.appendChild(sec);
@@ -450,14 +532,14 @@
         groupMap.forEach(group => {
             if (sF === 'all' || sF === group.name) {
                 let gAcq = 0;
-                group.teams.forEach(t => { for(let i=1;i<=20;i++) if(isAcquired(dbState[`${t.s}-${i}`])) gAcq++; });
+                group.teams.forEach(t => { for(let i=1;i<=20;i++) if(isAcquired(getStickerData(`${t.s}-${i}`).status)) gAcq++; });
                 const sec = createSection(group.name, gAcq, group.teams.length * 20);
                 sec.querySelector('.sticker-grid').remove();
 
                 group.teams.forEach(team => {
                     if (cF !== 'all' && team.s !== cF) return;
                     let tAcq = 0;
-                    for(let i=1;i<=20;i++) if(isAcquired(dbState[`${team.s}-${i}`])) tAcq++;
+                    for(let i=1;i<=20;i++) if(isAcquired(getStickerData(`${team.s}-${i}`).status)) tAcq++;
 
                     const cDiv = document.createElement('div');
                     cDiv.className = 'country-container';
@@ -472,7 +554,7 @@
                         <div class="sticker-grid"></div>`;
                     
                     for(let i=1;i<=20;i++) {
-                        const el = createStickerEl(`${team.s}-${i}`, `${team.s}${i}`, stF);
+                        const el = createStickerNode(`${team.s}-${i}`, `${team.s}${i}`, stF);
                         if(el) cDiv.querySelector('.sticker-grid').appendChild(el);
                     }
                     if(cDiv.querySelector('.sticker-grid').children.length > 0) sec.appendChild(cDiv);
@@ -483,10 +565,10 @@
 
         if (sF === 'all' || sF === 'coca') {
             let acq = 0;
-            for(let i=1;i<=14;i++) if(isAcquired(dbState[`CC-${i}`])) acq++;
+            for(let i=1;i<=14;i++) if(isAcquired(getStickerData(`CC-${i}`).status)) acq++;
             const sec = createSection("Coca-Cola", acq, 14);
             for(let i=1;i<=14;i++) {
-                const el = createStickerEl(`CC-${i}`, `CC${i}`, stF);
+                const el = createStickerNode(`CC-${i}`, `CC${i}`, stF);
                 if(el) sec.querySelector('.sticker-grid').appendChild(el);
             }
             if(sec.querySelector('.sticker-grid').children.length > 0) main.appendChild(sec);
@@ -499,17 +581,30 @@
         return d;
     }
 
-    function createStickerEl(id, label, stF) {
-        const s = dbState[id] || 'missing';
+    function createStickerNode(id, label, stF) {
+        const info = getStickerData(id);
         
-        // Filtros de status específicos no menu
+        // Regras adicionais de filtragem
         if (stF !== 'all') {
-            if (stF === 'missing' && isAcquired(s)) return null;
-            if (stF !== 'missing' && s !== stF) return null;
+            if (stF === 'missing' && isAcquired(info.status)) return null;
+            if (stF === 'repeats' && info.qty === 0) return null;
+            if (stF !== 'missing' && stF !== 'repeats' && info.status !== stF) return null;
         }
 
-        const e = document.createElement('div'); e.className = `sticker ${s}`; e.textContent = label;
-        e.onclick = () => toggleSticker(id);
+        const e = document.createElement('div'); 
+        e.className = `sticker ${info.status}`;
+        
+        // Elemento interno indicador de repetidas
+        let badgeHtml = info.qty > 0 ? `<div class="repeat-badge">${info.qty}x</div>` : '';
+
+        e.innerHTML = `
+            ${badgeHtml}
+            <div class="sticker-body" onclick="toggleSticker('${id}')">${label}</div>
+            <div class="repeat-controls">
+                <button class="btn-repeat btn-minus" onclick="changeQty('${id}', -1)">-</button>
+                <button class="btn-repeat btn-plus" onclick="changeQty('${id}', 1)">+</button>
+            </div>
+        `;
         return e;
     }
 
