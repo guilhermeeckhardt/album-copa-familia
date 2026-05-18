@@ -6,8 +6,11 @@
     <title>Painel Copa 2026 - Família</title>
     <style>
         :root {
-            --green: #27ae60;
-            --red: #c0392b;
+            --red: #c0392b;       /* Padrão / Faltando */
+            --green: #27ae60;     /* Ijuí */
+            --blue: #2980b9;      /* Gu */
+            --orange: #e67e22;    /* Cath */
+            --gold: #f1c40f;      /* No Álbum */
             --dark: #2c3e50;
             --section-bg: #ffffff;
             --country-bg: #f8f9fa;
@@ -70,7 +73,6 @@
             cursor: pointer;
         }
 
-        /* Botão para abrir o gerador de lista */
         .btn-generate {
             background-color: #25d366;
             color: white;
@@ -88,9 +90,7 @@
             transition: background 0.2s;
         }
 
-        .btn-generate:hover {
-            background-color: #128c7e;
-        }
+        .btn-generate:hover { background-color: #128c7e; }
 
         .container {
             padding: 15px;
@@ -98,6 +98,7 @@
             margin: 0 auto;
         }
 
+        /* Painel de Legenda e Estatísticas Geral */
         .stats-panel {
             background: var(--dark);
             color: white;
@@ -105,26 +106,35 @@
             padding: 20px;
             margin-bottom: 30px;
             display: flex;
-            justify-content: space-around;
-            text-align: center;
+            flex-direction: column;
+            gap: 20px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
-        .stat-item {
+        .stats-row {
             display: flex;
-            flex-direction: column;
+            justify-content: space-around;
+            text-align: center;
         }
 
-        .stat-value {
-            font-size: 1.5rem;
+        .stat-item { display: flex; flex-direction: column; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; }
+        .stat-label { font-size: 0.8rem; text-transform: uppercase; opacity: 0.8; }
+
+        /* Nova Legenda de Cores */
+        .legend-row {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 15px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
             font-weight: bold;
         }
-
-        .stat-label {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            opacity: 0.8;
-        }
+        .legend-item { display: flex; align-items: center; gap: 5px; }
+        .legend-box { width: 12px; height: 12px; border-radius: 3px; }
 
         .section-container {
             background: var(--section-bg);
@@ -169,32 +179,11 @@
             margin-bottom: 15px;
         }
 
-        .country-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+        .country-info { display: flex; align-items: center; gap: 12px; }
+        .flag-icon { width: 35px; height: 25px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd; }
+        .country-name { margin: 0; font-size: 1.1rem; font-weight: bold; text-transform: uppercase; }
 
-        .flag-icon {
-            width: 35px;
-            height: 25px;
-            object-fit: cover;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-        }
-
-        .country-name {
-            margin: 0;
-            font-size: 1.1rem;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-
-        .sticker-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(65px, 1fr));
-            gap: 8px;
-        }
+        .sticker-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(65px, 1fr)); gap: 8px; }
 
         .sticker {
             aspect-ratio: 1 / 1;
@@ -207,93 +196,33 @@
             font-size: 0.8rem;
             color: white;
             transition: transform 0.1s;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
         }
 
         .sticker:active { transform: scale(0.9); }
+        
+        /* Definição de Cores das Figurinhas */
         .missing { background-color: var(--red); }
         .owned { background-color: var(--green); }
+        .gu { background-color: var(--blue); }
+        .cath { background-color: var(--orange); }
+        .album { background-color: var(--gold); color: #222; text-shadow: none; }
 
-        /* Estilos do Modal (Nova Janela de Faltantes) */
+        /* Estilos do Modal */
         .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.6);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-            padding: 15px;
-            box-sizing: border-box;
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box;
         }
-
         .modal-content {
-            background: #111b21; /* Cor de fundo escura estilo WhatsApp Dark */
-            color: #e9edef;
-            padding: 20px;
-            border-radius: 12px;
-            max-width: 500px;
-            width: 100%;
-            max-height: 80vh;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            background: #111b21; color: #e9edef; padding: 20px; border-radius: 12px;
+            max-width: 500px; width: 100%; max-height: 80vh; display: flex; flex-direction: column; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            border-bottom: 1px solid #222d34;
-            padding-bottom: 10px;
-        }
-
-        .modal-header h2 {
-            margin: 0;
-            font-size: 1.2rem;
-        }
-
-        .btn-close {
-            background: transparent;
-            border: none;
-            color: #8696a0;
-            font-size: 24px;
-            cursor: pointer;
-        }
-
-        .txt-area-list {
-            background: #202c33;
-            color: #e9edef;
-            border: 1px solid #2a3942;
-            padding: 15px;
-            border-radius: 8px;
-            font-family: monospace;
-            font-size: 15px;
-            line-height: 1.5;
-            overflow-y: auto;
-            flex-grow: 1;
-            white-space: pre-wrap;
-            user-select: all;
-        }
-
-        .modal-footer {
-            margin-top: 15px;
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn-copy {
-            background-color: #00a884;
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            flex-grow: 1;
-            font-size: 14px;
-        }
-
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #222d34; padding-bottom: 10px; }
+        .modal-header h2 { margin: 0; font-size: 1.2rem; }
+        .btn-close { background: transparent; border: none; color: #8696a0; font-size: 24px; cursor: pointer; }
+        .txt-area-list { background: #202c33; color: #e9edef; border: 1px solid #2a3942; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 15px; line-height: 1.5; overflow-y: auto; flex-grow: 1; white-space: pre-wrap; user-select: all; }
+        .modal-footer { margin-top: 15px; display: flex; gap: 10px; }
+        .btn-copy { background-color: #00a884; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; flex-grow: 1; font-size: 14px; }
         .btn-copy:active { background-color: #008069; }
 
         @media (min-width: 600px) {
@@ -318,7 +247,10 @@
             <select id="statusFilter">
                 <option value="all">Status: Todas</option>
                 <option value="missing">Somente Faltantes</option>
-                <option value="owned">Somente Adquiridas</option>
+                <option value="owned">Adquiridas: Ijuí</option>
+                <option value="gu">Adquiridas: Gu</option>
+                <option value="cath">Adquiridas: Cath</option>
+                <option value="album">Coladas no Álbum</option>
             </select>
         </div>
         <button class="btn-generate" onclick="openMissingModal()">📋 Lista de Faltantes</button>
@@ -327,17 +259,26 @@
 
 <div class="container">
     <div class="stats-panel" id="globalStats">
-        <div class="stat-item">
-            <span class="stat-value" id="totalOwned">0</span>
-            <span class="stat-label">Adquiridas</span>
+        <div class="stats-row">
+            <div class="stat-item">
+                <span class="stat-value" id="totalOwned">0</span>
+                <span class="stat-label">Adquiridas</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value" id="totalMissing">0</span>
+                <span class="stat-label">Faltantes</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value" id="totalPercent">0%</span>
+                <span class="stat-label">Concluído</span>
+            </div>
         </div>
-        <div class="stat-item">
-            <span class="stat-value" id="totalMissing">0</span>
-            <span class="stat-label">Faltantes</span>
-        </div>
-        <div class="stat-item">
-            <span class="stat-value" id="totalPercent">0%</span>
-            <span class="stat-label">Concluído</span>
+        <div class="legend-row">
+            <div class="legend-item"><div class="legend-box" style="background:var(--red)"></div>Faltando</div>
+            <div class="legend-item"><div class="legend-box" style="background:var(--green)"></div>Ijuí</div>
+            <div class="legend-item"><div class="legend-box" style="background:var(--blue)"></div>Gu</div>
+            <div class="legend-item"><div class="legend-box" style="background:var(--orange)"></div>Cath</div>
+            <div class="legend-item"><div class="legend-box" style="background:var(--gold)"></div>Álbum</div>
         </div>
     </div>
 
@@ -376,7 +317,6 @@
     const db = getDatabase(app);
     const albumRef = ref(db, 'colecao_familia/');
 
-    // Mapeamento mantendo a ordem sequencial exata do álbum
     const groupMap = [
         { name: "Grupo A", teams: [{n:"MÉXICO", s:"MEX", c:"mx", e:"🇲🇽"}, {n:"ÁFRICA DO SUL", s:"RSA", c:"za", e:"🇿🇦"}, {n:"CORÉIA DO SUL", s:"KOR", c:"kr", e:"🇰🇷"}, {n:"REP. TCHECA", s:"CZE", c:"cz", e:"🇨🇿"}] },
         { name: "Grupo B", teams: [{n:"CANADA", s:"CAN", c:"ca", e:"🇨🇦"}, {n:"BOSNIA", s:"BIH", c:"ba", e:"🇧🇦"}, {n:"CATAR", s:"QAT", c:"qa", e:"🇶🇦"}, {n:"SUIÇA", s:"SUI", c:"ch", e:"🇨🇭"}] },
@@ -389,7 +329,7 @@
         { name: "Grupo I", teams: [{n:"FRANÇA", s:"FRA", c:"fr", e:"🇫🇷"}, {n:"SENEGAL", s:"SEN", c:"sn", e:"🇸🇳"}, {n:"IRAQUE", s:"IRQ", c:"iq", e:"🇮🇶"}, {n:"NORUEGA", s:"NOR", c:"no", e:"🇳🇴"}] },
         { name: "Grupo J", teams: [{n:"ARGENTINA", s:"ARG", c:"ar", e:"🇦🇷"}, {n:"ARGÉLIA", s:"ALG", c:"dz", e:"🇩🇿"}, {n:"AUSTRIA", s:"AUT", c:"at", e:"🇦🇹"}, {n:"JORDANIA", s:"JOR", c:"jo", e:"🇯🇴"}] },
         { name: "Grupo K", teams: [{n:"PORTUGAL", s:"POR", c:"pt", e:"🇵🇹"}, {n:"CONGO", s:"COD", c:"cd", e:"🇨🇩"}, {n:"UZBEQUISTÃO", s:"UZB", c:"uz", e:"🇺🇿"}, {n:"COLOMBIA", s:"COL", c:"co", e:"🇨🇴"}] },
-        { name: "Grupo L", teams: [{n:"INGLATERRA", s:"ENG", c:"gb-eng", e:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"}, {n:"CROACIA", s:"CRO", c:"hr", e:"🇭🇷"}, {n:"GANA", s:"GHA", c:"gh", e:"🇬🇭"}, {n:"PANAMA", s:"PAN", c:"pa", e:"🇵🇦"}] }
+        { name: "Grupo L", teams: [{n:"INGLATERRA", s:"ENG", c:"gb-eng", e:"🏴󠁧󠁢󠁥󠁮ッグ󠁿"}, {n:"CROACIA", s:"CRO", c:"hr", e:"🇭🇷"}, {n:"GANA", s:"GHA", c:"gh", e:"🇬🇭"}, {n:"PANAMA", s:"PAN", c:"pa", e:"🇵🇦"}] }
     ];
 
     const globalStickerIds = [];
@@ -415,13 +355,27 @@
     let dbState = {};
     onValue(albumRef, (snapshot) => { dbState = snapshot.val() || {}; updateGlobalStats(); render(); });
 
+    // CICLO DE CLIQUES DOS STATUS 
     window.toggleSticker = (id) => {
         const cur = dbState[id] || 'missing';
-        set(ref(db, 'colecao_familia/' + id), cur === 'missing' ? 'owned' : 'missing');
+        let nextStatus = 'missing';
+
+        if (cur === 'missing') nextStatus = 'owned';    // 1º Clique: Verde (Ijuí)
+        else if (cur === 'owned') nextStatus = 'gu';     // 2º Clique: Azul (Gu)
+        else if (cur === 'gu') nextStatus = 'cath';     // 3º Clique: Laranja (Cath)
+        else if (cur === 'cath') nextStatus = 'album';  // 4º Clique: Dourado (Álbum)
+        else if (cur === 'album') nextStatus = 'missing';// 5º Clique: Volta ao Vermelho
+
+        set(ref(db, 'colecao_familia/' + id), nextStatus);
     };
 
+    // Helper para checar se a figurinha foi adquirida (qualquer um dos status válidos)
+    function isAcquired(status) {
+        return ['owned', 'gu', 'cath', 'album'].includes(status);
+    }
+
     function updateGlobalStats() {
-        const owned = globalStickerIds.filter(id => dbState[id] === 'owned').length;
+        const owned = globalStickerIds.filter(id => isAcquired(dbState[id])).length;
         const total = globalStickerIds.length;
         const missing = total - owned;
         const percent = ((owned / total) * 100).toFixed(1);
@@ -431,60 +385,39 @@
         document.getElementById('totalPercent').textContent = `${percent}%`;
     }
 
-    // Janela Modal - Funções de Controle Globais
     window.openMissingModal = function() {
         const modal = document.getElementById('missingModal');
         const container = document.getElementById('textListContainer');
         modal.style.display = 'flex';
-        
         let outputText = "";
 
-        // 1. Processa FWC / History na ordem sequencial
         let missingFWC = [];
         for(let i=0; i<=19; i++) {
             const id = i <= 8 ? `FWC-${i}` : `HIST-${i}`;
-            if((dbState[id] || 'missing') === 'missing') {
-                missingFWC.push(i);
-            }
+            if(!isAcquired(dbState[id])) missingFWC.push(i);
         }
-        if(missingFWC.length > 0) {
-            outputText += `FWC 🌍 : ${missingFWC.join(', ')}\n`;
-        }
+        if(missingFWC.length > 0) outputText += `FWC 🌍 : ${missingFWC.join(', ')}\n`;
 
-        // 2. Processa os times na ordem original cronológica do álbum (Do Grupo A ao L)
         groupMap.forEach(group => {
             group.teams.forEach(team => {
                 let missingNumbers = [];
                 for(let i=1; i<=20; i++) {
-                    if((dbState[`${team.s}-${i}`] || 'missing') === 'missing') {
-                        missingNumbers.push(i);
-                    }
+                    if(!isAcquired(dbState[`${team.s}-${i}`])) missingNumbers.push(i);
                 }
-                if(missingNumbers.length > 0) {
-                    outputText += `${team.s} ${team.e} : ${missingNumbers.join(', ')}\n`;
-                }
+                if(missingNumbers.length > 0) outputText += `${team.s} ${team.e} : ${missingNumbers.join(', ')}\n`;
             });
         });
 
-        // 3. Processa Coca-Cola
         let missingCoca = [];
         for(let i=1; i<=14; i++) {
-            if((dbState[`CC-${i}`] || 'missing') === 'missing') {
-                missingCoca.push(i);
-            }
+            if(!isAcquired(dbState[`CC-${i}`])) missingCoca.push(i);
         }
-        if(missingCoca.length > 0) {
-            outputText += `COCA-COLA 🥤 : ${missingCoca.join(', ')}\n`;
-        }
+        if(missingCoca.length > 0) outputText += `COCA-COLA 🥤 : ${missingCoca.join(', ')}\n`;
 
-        container.removeAttribute('data-raw');
         container.textContent = outputText || "🎉 Parabéns! O álbum está completo!";
     };
 
-    window.closeMissingModal = function() {
-        document.getElementById('missingModal').style.display = 'none';
-    };
-
+    window.closeMissingModal = function() { document.getElementById('missingModal').style.display = 'none'; };
     window.copyListText = function() {
         const container = document.getElementById('textListContainer');
         navigator.clipboard.writeText(container.textContent).then(() => {
@@ -492,10 +425,7 @@
             const originalText = btn.textContent;
             btn.textContent = "✓ Copiado!";
             btn.style.backgroundColor = "#005a4e";
-            setTimeout(() => {
-                btn.textContent = originalText;
-                btn.style.backgroundColor = "#00a884";
-            }, 2000);
+            setTimeout(() => { btn.textContent = originalText; btn.style.backgroundColor = "#00a884"; }, 2000);
         });
     };
 
@@ -508,7 +438,7 @@
 
         if (sF === 'all' || sF === 'history') {
             const ids = Array.from({length:20}, (_,i) => i<=8 ? `FWC-${i}` : `HIST-${i}`);
-            const acq = ids.filter(id => dbState[id] === 'owned').length;
+            const acq = ids.filter(id => isAcquired(dbState[id])).length;
             const sec = createSection("FIFA World Cup History", acq, 20);
             ids.forEach(id => {
                 const el = createStickerEl(id, id.split('-')[1].padStart(2,'0'), stF);
@@ -520,14 +450,14 @@
         groupMap.forEach(group => {
             if (sF === 'all' || sF === group.name) {
                 let gAcq = 0;
-                group.teams.forEach(t => { for(let i=1;i<=20;i++) if(dbState[`${t.s}-${i}`]==='owned') gAcq++; });
+                group.teams.forEach(t => { for(let i=1;i<=20;i++) if(isAcquired(dbState[`${t.s}-${i}`])) gAcq++; });
                 const sec = createSection(group.name, gAcq, group.teams.length * 20);
                 sec.querySelector('.sticker-grid').remove();
 
                 group.teams.forEach(team => {
                     if (cF !== 'all' && team.s !== cF) return;
                     let tAcq = 0;
-                    for(let i=1;i<=20;i++) if(dbState[`${team.s}-${i}`]==='owned') tAcq++;
+                    for(let i=1;i<=20;i++) if(isAcquired(dbState[`${team.s}-${i}`])) tAcq++;
 
                     const cDiv = document.createElement('div');
                     cDiv.className = 'country-container';
@@ -553,7 +483,7 @@
 
         if (sF === 'all' || sF === 'coca') {
             let acq = 0;
-            for(let i=1;i<=14;i++) if(dbState[`CC-${i}`]==='owned') acq++;
+            for(let i=1;i<=14;i++) if(isAcquired(dbState[`CC-${i}`])) acq++;
             const sec = createSection("Coca-Cola", acq, 14);
             for(let i=1;i<=14;i++) {
                 const el = createStickerEl(`CC-${i}`, `CC${i}`, stF);
@@ -571,7 +501,13 @@
 
     function createStickerEl(id, label, stF) {
         const s = dbState[id] || 'missing';
-        if (stF !== 'all' && s !== stF) return null;
+        
+        // Filtros de status específicos no menu
+        if (stF !== 'all') {
+            if (stF === 'missing' && isAcquired(s)) return null;
+            if (stF !== 'missing' && s !== stF) return null;
+        }
+
         const e = document.createElement('div'); e.className = `sticker ${s}`; e.textContent = label;
         e.onclick = () => toggleSticker(id);
         return e;
