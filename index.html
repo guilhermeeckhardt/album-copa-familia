@@ -33,7 +33,6 @@
             align-items: center;
         }
 
-        /* Título Principal Centralizado */
         .main-title {
             width: 100%;
             text-align: center;
@@ -45,7 +44,6 @@
             letter-spacing: 1px;
         }
 
-        /* Container de Filtros Ajustado */
         .filters-container {
             display: grid;
             grid-template-columns: 1fr;
@@ -71,7 +69,6 @@
             margin: 0 auto;
         }
 
-        /* Painel de Estatísticas Geral */
         .stats-panel {
             background: var(--dark);
             color: white;
@@ -100,7 +97,6 @@
             opacity: 0.8;
         }
 
-        /* Seções e Países */
         .section-container {
             background: var(--section-bg);
             border-radius: 12px;
@@ -188,7 +184,6 @@
         .missing { background-color: var(--red); }
         .owned { background-color: var(--green); }
 
-        /* Responsividade para Filtros */
         @media (min-width: 600px) {
             .filters-container { grid-template-columns: repeat(3, 1fr); }
         }
@@ -197,18 +192,20 @@
 <body>
 
 <header>
-    <h1 class="main-title">ÁLBUM COPA DO MUNDO 2026 FAMÍLIA</h1>
+    <h1 class="main-title">ALBUM COPA DO MUNDO 2026 FAMILIA</h1>
     <div class="filters-container">
         <select id="sessionFilter">
             <option value="all">Todas as Sessões</option>
             <option value="history">FIFA World Cup History</option>
             <option value="coca">Coca-Cola</option>
         </select>
-        <select id="countryFilter"><option value="all">Todos os Países</option></select>
+        <select id="countryFilter">
+            <option value="all">Todos os Países</option>
+        </select>
         <select id="statusFilter">
-            <option value="all">Todas as Figurinhas</option>
-            <option value="missing">Faltantes</option>
-            <option value="owned">Adquiridas</option>
+            <option value="all">Status: Todas</option>
+            <option value="missing">Somente Faltantes</option>
+            <option value="owned">Somente Adquiridas</option>
         </select>
     </div>
 </header>
@@ -271,15 +268,28 @@
     groupMap.forEach(g => g.teams.forEach(t => { for(let i=1; i<=20; i++) globalStickerIds.push(`${t.s}-${i}`); }));
     for(let i=1; i<=14; i++) globalStickerIds.push(`CC-${i}`);
 
+    // CONFIGURAÇÃO DOS FILTROS
     const sessionFilter = document.getElementById('sessionFilter');
     const countrySelect = document.getElementById('countryFilter');
+    
+    // 1. Preenche Filtro de Sessões (Grupos)
     groupMap.forEach(g => {
         const opt = document.createElement('option'); opt.value = g.name; opt.textContent = g.name;
         sessionFilter.insertBefore(opt, sessionFilter.lastElementChild);
-        g.teams.forEach(t => {
-            const co = document.createElement('option'); co.value = t.s; co.textContent = t.n;
-            countrySelect.appendChild(co);
-        });
+    });
+
+    // 2. Coleta, ordena e preenche Filtro de Países 
+    const listAllTeams = groupMap.flatMap(g => g.teams);
+    
+    // Ordenação Alfabética considerando acentos locais (ex: Á, É, Ó, C)
+    listAllTeams.sort((teamA, teamB) => teamA.n.localeCompare(teamB.n, 'pt-BR'));
+    
+    // Adiciona as opções formatadas: "SIGLA - NOME DO PAÍS" 
+    listAllTeams.forEach(team => {
+        const co = document.createElement('option'); 
+        co.value = team.s; 
+        co.textContent = `${team.s} - ${team.n}`; 
+        countrySelect.appendChild(co);
     });
 
     let dbState = {};
