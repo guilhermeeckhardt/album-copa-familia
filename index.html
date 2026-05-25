@@ -241,14 +241,12 @@
         .btn-repeat:active:not(:disabled) { background: rgba(255,255,255,0.2); }
         .btn-minus { border-right: 1px solid rgba(255,255,255,0.15); }
 
-        /* Estado desabilitado (bloqueado para figurinhas faltantes) */
         .btn-repeat:disabled {
             color: rgba(255, 255, 255, 0.3) !important;
             cursor: not-allowed;
             background: rgba(0, 0, 0, 0.1) !important;
         }
 
-        /* Cores das Figurinhas */
         .missing { background-color: var(--red); }
         .owned { background-color: var(--green); }
         .gu { background-color: var(--blue); }
@@ -259,7 +257,6 @@
         .album .btn-repeat:disabled { color: rgba(0, 0, 0, 0.2) !important; }
         .album .btn-minus { border-right: 1px solid rgba(0,0,0,0.08); }
 
-        /* Estilos do Modal */
         .modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box;
@@ -292,6 +289,7 @@
             <select id="sessionFilter">
                 <option value="all">Todas as Sessões</option>
                 <option value="history">FIFA World Cup History</option>
+                <option value="countries">Países</option>
                 <option value="coca">Coca-Cola</option>
             </select>
             <select id="countryFilter"><option value="all">Todos os Países</option></select>
@@ -389,13 +387,7 @@
     groupMap.forEach(g => g.teams.forEach(t => { for(let i=1; i<=20; i++) globalStickerIds.push(`${t.s}-${i}`); }));
     for(let i=1; i<=14; i++) globalStickerIds.push(`CC-${i}`);
 
-    const sessionFilter = document.getElementById('sessionFilter');
     const countrySelect = document.getElementById('countryFilter');
-    
-    groupMap.forEach(g => {
-        const opt = document.createElement('option'); opt.value = g.name; opt.textContent = g.name;
-        sessionFilter.insertBefore(opt, sessionFilter.lastElementChild);
-    });
 
     const listAllTeams = groupMap.flatMap(g => g.teams);
     listAllTeams.sort((teamA, teamB) => teamA.n.localeCompare(teamB.n, 'pt-BR'));
@@ -419,7 +411,6 @@
         else if (curStatus === 'cath') nextStatus = 'album';
         else if (curStatus === 'album') nextStatus = 'missing';
 
-        // Regra extra de segurança: Se voltou a faltar, limpa a quantidade de repetidas para 0
         if (nextStatus === 'missing') curQty = 0;
 
         set(ref(db, 'colecao_familia/' + id), { status: nextStatus, qty: curQty });
@@ -430,7 +421,6 @@
         const curStatus = (typeof data === 'string') ? data : (data.status || 'missing');
         let curQty = data.qty || 0;
 
-        // Proteção extra via JS: Não faz nada se a figurinha estiver faltando
         if (curStatus === 'missing') return;
 
         curQty += change;
@@ -539,7 +529,7 @@
         }
 
         groupMap.forEach(group => {
-            if (sF === 'all' || sF === group.name) {
+            if (sF === 'all' || sF === 'countries') {
                 let gAcq = 0;
                 group.teams.forEach(t => { for(let i=1;i<=20;i++) if(isAcquired(getStickerData(`${t.s}-${i}`).status)) gAcq++; });
                 const sec = createSection(group.name, gAcq, group.teams.length * 20);
@@ -605,7 +595,6 @@
         
         let badgeHtml = info.qty > 0 ? `<div class="repeat-badge">${info.qty}x</div>` : '';
 
-        // O atributo 'disabled' é adicionado condicionalmente se a figurinha for faltante (isMissing)
         e.innerHTML = `
             ${badgeHtml}
             <div class="sticker-body" onclick="toggleSticker('${id}')">${label}</div>
